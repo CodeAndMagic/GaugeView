@@ -652,12 +652,17 @@ public class GaugeView extends View {
 	}
 
 	private void drawText(final Canvas canvas) {
-		final String text = !TextUtils.isEmpty(mTextValue) ? mTextValue : valueString(mCurrentValue);
-		canvas.drawText(text, CENTER, CENTER + 0.1f, mTextValuePaint);
+		final String textValue = !TextUtils.isEmpty(mTextValue) ? mTextValue : valueString(mCurrentValue);
+		final float textValueWidth = mTextValuePaint.measureText(textValue);
+		final float textUnitWidth = !TextUtils.isEmpty(mTextUnit) ? mTextUnitPaint.measureText(mTextUnit) : 0;
+
+		final float startX = CENTER - textUnitWidth / 2;
+		final float startY = CENTER + 0.1f;
+
+		canvas.drawText(textValue, startX, startY, mTextValuePaint);
 
 		if (!TextUtils.isEmpty(mTextUnit)) {
-			final float w = mTextValuePaint.measureText(text);
-			canvas.drawText(mTextUnit, CENTER + w / 2 + 0.06f, CENTER, mTextUnitPaint);
+			canvas.drawText(mTextUnit, CENTER + textValueWidth / 2 + 0.03f, CENTER, mTextUnitPaint);
 		}
 	}
 
@@ -786,11 +791,16 @@ public class GaugeView extends View {
 	}
 
 	public void setTargetValue(final float value) {
-		if (value < mScaleStartValue) {
-			mTargetValue = mScaleStartValue;
-		}
-		else if (value > mScaleEndValue) {
-			mTargetValue = mScaleEndValue;
+		if (mShowScale || mShowRanges) {
+			if (value < mScaleStartValue) {
+				mTargetValue = mScaleStartValue;
+			}
+			else if (value > mScaleEndValue) {
+				mTargetValue = mScaleEndValue;
+			}
+			else {
+				mTargetValue = value;
+			}
 		}
 		else {
 			mTargetValue = value;
