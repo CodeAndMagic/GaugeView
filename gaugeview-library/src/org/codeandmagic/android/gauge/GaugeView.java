@@ -42,7 +42,6 @@ public class GaugeView extends View {
 	public static final float RIGHT = 1.0f;
 	public static final float BOTTOM = 1.0f;
 	public static final float CENTER = 0.5f;
-
 	public static final boolean SHOW_OUTER_SHADOW = true;
 	public static final boolean SHOW_OUTER_BORDER = true;
 	public static final boolean SHOW_OUTER_RIM = true;
@@ -223,7 +222,6 @@ public class GaugeView extends View {
 			final int textUnitId = a.getResourceId(R.styleable.GaugeView_textUnit, 0);
 			final String textUnit = a.getString(R.styleable.GaugeView_textUnit);
 			mTextUnit = (0 < textUnitId) ? context.getString(textUnitId) : (null != textUnit) ? textUnit : "";
-
 			mTextValueColor = a.getColor(R.styleable.GaugeView_textValueColor, TEXT_VALUE_COLOR);
 			mTextUnitColor = a.getColor(R.styleable.GaugeView_textUnitColor, TEXT_UNIT_COLOR);
 			mTextShadowColor = a.getColor(R.styleable.GaugeView_textShadowColor, TEXT_SHADOW_COLOR);
@@ -583,12 +581,13 @@ public class GaugeView extends View {
 			// Let go of the old background
 			mBackground.recycle();
 		}
-
 		// Create a new background according to the new width and height
 		mBackground = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
 		final Canvas canvas = new Canvas(mBackground);
 		final float scale = Math.min(getWidth(), getHeight());
 		canvas.scale(scale, scale);
+		canvas.translate((scale == getHeight()) ? ((getWidth()-scale) /2)/scale : 0 
+				,(scale == getWidth()) ? ((getHeight()-scale) /2 )/scale: 0);
 
 		drawRim(canvas);
 		drawFace(canvas);
@@ -604,7 +603,9 @@ public class GaugeView extends View {
 
 		final float scale = Math.min(getWidth(), getHeight());
 		canvas.scale(scale, scale);
-
+		canvas.translate((scale == getHeight()) ? ((getWidth()-scale) /2)/scale : 0 
+				,(scale == getWidth()) ? ((getHeight()-scale) /2 )/scale: 0);
+		
 		if (mShowNeedle) {
 			drawNeedle(canvas);
 		}
@@ -624,7 +625,6 @@ public class GaugeView extends View {
 			canvas.drawBitmap(mBackground, 0, 0, mBackgroundPaint);
 		}
 	}
-
 	private void drawRim(final Canvas canvas) {
 		if (mShowOuterShadow) {
 			canvas.drawOval(mOuterShadowRect, mOuterShadowPaint);
@@ -668,7 +668,6 @@ public class GaugeView extends View {
 
 	private void drawScale(final Canvas canvas) {
 		canvas.save(Canvas.MATRIX_SAVE_FLAG);
-
 		// On canvas, North is 0 degrees, East is 90 degrees, South is 180 etc.
 		// We start the scale somewhere South-West so we need to first rotate the canvas.
 		canvas.rotate(mScaleRotation, 0.5f, 0.5f);
@@ -759,7 +758,6 @@ public class GaugeView extends View {
 		if (-1 != mNeedleLastMoved) {
 			final float time = (System.currentTimeMillis() - mNeedleLastMoved) / 1000.0f;
 			final float direction = Math.signum(mNeedleVelocity);
-
 			if (Math.abs(mNeedleVelocity) < 90.0f) {
 				mNeedleAcceleration = 5.0f * (mTargetValue - mCurrentValue);
 			}
@@ -810,3 +808,5 @@ public class GaugeView extends View {
 	}
 
 }
+
+	
