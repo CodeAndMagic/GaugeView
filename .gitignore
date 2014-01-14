@@ -11,9 +11,18 @@
 # generated files
 bin/
 gen/
+out/
+target/
 
 # Local configuration file (sdk path, etc)
 local.properties
 
-# Temporary directory
-temp/
+# Eclipse files
+.properties
+.settings
+.classpath
+.project
+
+# IntelliJ files
+.idea
+*.iml
