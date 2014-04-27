@@ -652,8 +652,27 @@ public class GaugeView extends View {
 
     private void drawText(final Canvas canvas) {
         final String textValue = !TextUtils.isEmpty(mTextValue) ? mTextValue : valueString(mCurrentValue);
-        final float textValueWidth = mTextValuePaint.measureText(textValue);
-        final float textUnitWidth = !TextUtils.isEmpty(mTextUnit) ? mTextUnitPaint.measureText(mTextUnit) : 0;
+        float textValueWidth = mTextValuePaint.measureText(textValue);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+        	float tmpTextSize = mTextValuePaint.getTextSize();
+        	mTextValuePaint.setTextSize(tmpTextSize * 1000);
+        	textValueWidth = mTextValuePaint.measureText(textValue);
+        	mTextValuePaint.setTextSize(tmpTextSize);
+        	textValueWidth = (float) (textValueWidth / 1000);
+        }
+		
+		float textUnitWidth = 0;
+        if (!TextUtils.isEmpty(mTextUnit)) {
+        	textUnitWidth = mTextUnitPaint.measureText(mTextUnit);
+            
+        	if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+            	float tmpTextSize = mTextUnitPaint.getTextSize();
+            	mTextUnitPaint.setTextSize(tmpTextSize * 1000);
+            	textUnitWidth = mTextUnitPaint.measureText(mTextUnit);
+            	mTextUnitPaint.setTextSize(tmpTextSize);
+            	textUnitWidth = (float) (textUnitWidth / 1000);
+            }
+        }
 
         final float startX = CENTER - textUnitWidth / 2;
         final float startY = CENTER + 0.1f;
