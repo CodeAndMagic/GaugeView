@@ -7,26 +7,12 @@
  *******************************************************************************/
 package org.codeandmagic.android.gauge;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.BitmapShader;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.ComposeShader;
-import android.graphics.LinearGradient;
-import android.graphics.Matrix;
-import android.graphics.Paint;
+import android.graphics.*;
 import android.graphics.Paint.Align;
-import android.graphics.Path;
-import android.graphics.PorterDuff;
-import android.graphics.RadialGradient;
-import android.graphics.RectF;
 import android.graphics.Shader.TileMode;
-import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -235,8 +221,8 @@ public class GaugeView extends View {
 
     private void readRanges(final Resources res, final int rangesId, final int colorsId) {
         if (rangesId > 0 && colorsId > 0) {
-            final String[] ranges = res.getStringArray(R.array.ranges);
-            final String[] colors = res.getStringArray(R.array.rangeColors);
+            final String[] ranges = res.getStringArray(rangesId);
+            final String[] colors = res.getStringArray(colorsId);
             if (ranges.length != colors.length) {
                 throw new IllegalArgumentException(
                         "The ranges and colors arrays must have the same length.");
@@ -255,13 +241,12 @@ public class GaugeView extends View {
         }
     }
 
-    @TargetApi(11)
     private void init() {
         // TODO Why isn't this working with HA layer?
         // The needle is not displayed although the onDraw() is being triggered by invalidate()
         // calls.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+        if (Build.VERSION.SDK_INT >=11) { //Build.VERSION_CODES.HONEYCOMB=11 wasn't added until api level 11
+            setLayerType(1, null); //View.LAYER_TYPE_SOFTWARE=1 wasn't added until api level 11
         }
 
         initDrawingRects();
