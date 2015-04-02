@@ -23,7 +23,8 @@
         <attr name="scaleStartValue" format="float" />
         <attr name="scaleEndValue" format="float" />
         <attr name="scaleStartAngle" format="float" />
-        
+        <attr name="scaleEndAngle" format="float" />
+
         <attr name="divisions" format="integer" />
         <attr name="subdivisions" format="integer" />
         
