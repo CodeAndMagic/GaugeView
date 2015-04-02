@@ -107,6 +107,7 @@ public class GaugeView extends View {
     private float mScaleStartValue;
     private float mScaleEndValue;
     private float mScaleStartAngle;
+    private float mScaleEndAngle;
     private float[] mRangeValues;
 
     private int[] mRangeColors;
@@ -204,6 +205,7 @@ public class GaugeView extends View {
         mScaleStartValue = a.getFloat(R.styleable.GaugeView_scaleStartValue, SCALE_START_VALUE);
         mScaleEndValue = a.getFloat(R.styleable.GaugeView_scaleEndValue, SCALE_END_VALUE);
         mScaleStartAngle = a.getFloat(R.styleable.GaugeView_scaleStartAngle, SCALE_START_ANGLE);
+        mScaleEndAngle = a.getFloat(R.styleable.GaugeView_scaleEndAngle, 360.0f - mScaleStartAngle);
 
         mDivisions = a.getInteger(R.styleable.GaugeView_divisions, SCALE_DIVISIONS);
         mSubdivisions = a.getInteger(R.styleable.GaugeView_subdivisions, SCALE_SUBDIVISIONS);
@@ -539,7 +541,7 @@ public class GaugeView extends View {
         mScaleRotation = (mScaleStartAngle + 180) % 360;
         mDivisionValue = (mScaleEndValue - mScaleStartValue) / mDivisions;
         mSubdivisionValue = mDivisionValue / mSubdivisions;
-        mSubdivisionAngle = (360 - 2 * mScaleStartAngle) / (mDivisions * mSubdivisions);
+        mSubdivisionAngle = (mScaleEndAngle - mScaleStartAngle) / (mDivisions * mSubdivisions);
     }
 
     @Override
