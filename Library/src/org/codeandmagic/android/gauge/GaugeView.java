@@ -9,7 +9,6 @@ package org.codeandmagic.android.gauge;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -33,6 +32,8 @@ import android.os.Parcelable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
+
+import com.hoshan.tarik.test2.R;
 
 public class GaugeView extends View {
 
@@ -72,8 +73,8 @@ public class GaugeView extends View {
     public static final float[] OUTER_SHADOW_POS = {0.90f, 0.95f, 0.99f};
 
     public static final float[] RANGE_VALUES = {16.0f, 25.0f, 40.0f, 100.0f};
-    public static final int[] RANGE_COLORS = {Color.rgb(231, 32, 43), Color.rgb(232, 111, 33), Color.rgb(232, 231, 33),
-            Color.rgb(27, 202, 33)};
+    public static final int[] RANGE_COLORS = {Color.rgb(231, 32, 43), Color.rgb(232, 111, 33),
+                                              Color.rgb(232, 231, 33), Color.rgb(27, 202, 33)};
 
     public static final int TEXT_SHADOW_COLOR = Color.argb(100, 0, 0, 0);
     public static final int TEXT_VALUE_COLOR = Color.WHITE;
@@ -106,6 +107,7 @@ public class GaugeView extends View {
     private float mScaleStartValue;
     private float mScaleEndValue;
     private float mScaleStartAngle;
+    private float mScaleEndAngle;
     private float[] mRangeValues;
 
     private int[] mRangeColors;
@@ -203,15 +205,17 @@ public class GaugeView extends View {
         mScaleStartValue = a.getFloat(R.styleable.GaugeView_scaleStartValue, SCALE_START_VALUE);
         mScaleEndValue = a.getFloat(R.styleable.GaugeView_scaleEndValue, SCALE_END_VALUE);
         mScaleStartAngle = a.getFloat(R.styleable.GaugeView_scaleStartAngle, SCALE_START_ANGLE);
+        mScaleEndAngle = a.getFloat(R.styleable.GaugeView_scaleEndAngle, 360.0f - mScaleStartAngle);
 
         mDivisions = a.getInteger(R.styleable.GaugeView_divisions, SCALE_DIVISIONS);
         mSubdivisions = a.getInteger(R.styleable.GaugeView_subdivisions, SCALE_SUBDIVISIONS);
 
         if (mShowRanges) {
             mTextShadowColor = a.getColor(R.styleable.GaugeView_textShadowColor, TEXT_SHADOW_COLOR);
-            final int rangesId = a.getResourceId(R.styleable.GaugeView_rangeValues, 0);
-            final int colorsId = a.getResourceId(R.styleable.GaugeView_rangeColors, 0);
-            readRanges(context.getResources(), rangesId, colorsId);
+
+            final CharSequence[] rangeValues = a.getTextArray(R.styleable.GaugeView_rangeValues);
+            final CharSequence[] rangeColors = a.getTextArray(R.styleable.GaugeView_rangeColors);
+            readRanges(rangeValues, rangeColors);
         }
 
         if (mShowText) {
@@ -233,24 +237,43 @@ public class GaugeView extends View {
         a.recycle();
     }
 
-    private void readRanges(final Resources res, final int rangesId, final int colorsId) {
-        if (rangesId > 0 && colorsId > 0) {
-            final String[] ranges = res.getStringArray(R.array.ranges);
-            final String[] colors = res.getStringArray(R.array.rangeColors);
-            if (ranges.length != colors.length) {
-                throw new IllegalArgumentException(
-                        "The ranges and colors arrays must have the same length.");
-            }
+    private void readRanges(final CharSequence[] rangeValues, final CharSequence[] rangeColors) {
 
-            final int length = ranges.length;
+        int rangeValuesLength;
+        if (rangeValues == null) {
+            rangeValuesLength = RANGE_VALUES.length;
+        } else {
+            rangeValuesLength = rangeValues.length;
+        }
+
+        int rangeColorsLength;
+        if (rangeColors == null) {
+            rangeColorsLength = RANGE_COLORS.length;
+        } else {
+            rangeColorsLength = rangeColors.length;
+        }
+
+        if (rangeValuesLength != rangeColorsLength) {
+            throw new IllegalArgumentException(
+                    "The ranges and colors arrays must have the same length.");
+        }
+
+        final int length = rangeValuesLength;
+        if (rangeValues != null) {
             mRangeValues = new float[length];
-            mRangeColors = new int[length];
             for (int i = 0; i < length; i++) {
-                mRangeValues[i] = Float.parseFloat(ranges[i]);
-                mRangeColors[i] = Color.parseColor(colors[i]);
+                mRangeValues[i] = Float.parseFloat(rangeValues[i].toString());
             }
         } else {
             mRangeValues = RANGE_VALUES;
+        }
+
+        if (rangeColors != null) {
+            mRangeColors = new int[length];
+            for (int i = 0; i < length; i++) {
+                mRangeColors[i] = Color.parseColor(rangeColors[i].toString());
+            }
+        } else {
             mRangeColors = RANGE_COLORS;
         }
     }
@@ -462,11 +485,6 @@ public class GaugeView extends View {
         return paint;
     }
 
-    public void setDefaultRanges() {
-        mRangeValues = new float[]{16, 25, 40, 100};
-        mRangeColors = new int[]{Color.rgb(231, 32, 43), Color.rgb(232, 111, 33), Color.rgb(232, 231, 33), Color.rgb(27, 202, 33)};
-    }
-
     public void setDefaultScaleRangePaints() {
         final int length = mRangeValues.length;
         mRangePaints = new Paint[length];
@@ -523,7 +541,7 @@ public class GaugeView extends View {
         mScaleRotation = (mScaleStartAngle + 180) % 360;
         mDivisionValue = (mScaleEndValue - mScaleStartValue) / mDivisions;
         mSubdivisionValue = mDivisionValue / mSubdivisions;
-        mSubdivisionAngle = (360 - 2 * mScaleStartAngle) / (mDivisions * mSubdivisions);
+        mSubdivisionAngle = (mScaleEndAngle - mScaleStartAngle) / (mDivisions * mSubdivisions);
     }
 
     @Override
@@ -678,15 +696,14 @@ public class GaugeView extends View {
             final float y3 = y1 + 0.045f; // height of subdivision
 
             final float value = getValueForTick(i);
-            final Paint paint = getRangePaint(value);
+            final Paint paint = getRangePaint(mScaleStartValue + value);
 
-            float div = mScaleEndValue / (float) mDivisions;
-            float mod = value % div;
-            if ((Math.abs(mod - 0) < 0.001) || (Math.abs(mod - div) < 0.001)) {
+            float mod = value % mDivisionValue;
+            if ((Math.abs(mod - 0) < 0.001) || (Math.abs(mod - mDivisionValue) < 0.001)) {
                 // Draw a division tick
                 canvas.drawLine(0.5f, y1, 0.5f, y3, paint);
                 // Draw the text 0.15 away from the division tick
-                canvas.drawText(valueString(value), 0.5f, y3 + 0.045f, paint);
+                canvas.drawText(valueString(mScaleStartValue +  value), 0.5f, y3 + 0.045f, paint);
             } else {
                 // Draw a subdivision tick
                 canvas.drawLine(0.5f, y1, 0.5f, y2, paint);
@@ -746,7 +763,7 @@ public class GaugeView extends View {
     }
 
     private float getAngleForValue(final float value) {
-        return (mScaleRotation + (value / mSubdivisionValue) * mSubdivisionAngle) % 360;
+        return (mScaleRotation + ((value - mScaleStartValue) / mSubdivisionValue) * mSubdivisionAngle) % 360;
     }
 
     private void computeCurrentValue() {
@@ -804,5 +821,3 @@ public class GaugeView extends View {
     }
 
 }
-
-	
