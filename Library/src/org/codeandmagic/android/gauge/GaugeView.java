@@ -32,7 +32,6 @@ import android.os.Parcelable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
-import openmatics.com.ave130_pm.R;
 
 public class GaugeView extends View {
 
