@@ -32,6 +32,7 @@ import android.os.Parcelable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
+import openmatics.com.ave130_pm.R;
 
 public class GaugeView extends View {
 
@@ -694,10 +695,20 @@ public class GaugeView extends View {
 			final float y3 = y1 + 0.045f; // height of subdivision
 
 			final float value = getValueForTick(i);
-            final Paint paint = getRangePaint(mScaleStartValue + value);
+            //final Paint paint = getRangePaint(mScaleStartValue + value);
+			final Paint paint = getRangePaint(value);
 
             float mod = value % mDivisionValue;
-            if ((Math.abs(mod - 0) < 0.001) || (Math.abs(mod - mDivisionValue) < 0.001)) {
+            /*if ((Math.abs(mod - 0) < 0.001) || (Math.abs(mod - mDivisionValue) < 0.001)) {
+				// Draw a division tick
+				canvas.drawLine(0.5f, y1, 0.5f, y3, paint);
+				// Draw the text 0.15 away from the division tick
+				drawTextOnCanvasWithMagnifier(canvas, valueString(value), 0.5f, y3 + 0.045f, paint);
+			} else {
+				// Draw a subdivision tick
+				canvas.drawLine(0.5f, y1, 0.5f, y2, paint);
+			}*/
+			if ((Math.abs(mod - 0) < 0.001) || (Math.abs(mod - mDivisionValue) < 0.001)) {
 				// Draw a division tick
 				canvas.drawLine(0.5f, y1, 0.5f, y3, paint);
 				// Draw the text 0.15 away from the division tick
@@ -706,6 +717,8 @@ public class GaugeView extends View {
 				// Draw a subdivision tick
 				canvas.drawLine(0.5f, y1, 0.5f, y2, paint);
 			}
+
+
 			canvas.rotate(mSubdivisionAngle, 0.5f, 0.5f);
 		}
 		canvas.restore();
@@ -744,7 +757,7 @@ public class GaugeView extends View {
 	}
 
 	private float getValueForTick(final int tick) {
-		return tick * (mDivisionValue / mSubdivisions);
+		return mScaleStartValue + tick * (mDivisionValue / mSubdivisions);
 	}
 
 	private Paint getRangePaint(final float value) {
