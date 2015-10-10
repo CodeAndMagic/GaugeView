@@ -6,8 +6,7 @@ An Android library for drawing gauges on Canvas.
 
 ![GaugeView](http://goo.gl/Hu7Ou)
 
-### Usage
-=====
+## Usage
 
 Import the library into your project.
 
@@ -50,8 +49,7 @@ mGaugeView1.setTargetValue(25);
 mGaugeView2.setTargetValue(35);
 ```
 
-### TODO (coming soon)
-=====
+## TODO (coming soon)
 
 - [ ] Clean up the code.
 
